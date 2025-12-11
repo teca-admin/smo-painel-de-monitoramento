@@ -81,7 +81,87 @@ export const Dashboard: React.FC<DashboardProps> = ({
     return cols;
   }, [manifestos]);
 
-  // Cronômetro
+  // Função robusta e inteligente para interpretar datas (BR e ISO)
+  const parseDateBr = (dateStr?: string): Date | null => {
+    if (!dateStr) return null;
+    const cleanStr = dateStr.trim();
+    const now = new Date();
+
+    // 1. Tenta formato BR: DD/MM/AAAA HH:mm:ss
+    if (cleanStr.includes('/')) {
+        const [datePart, timePart] = cleanStr.split(' ');
+        if (!datePart) return null;
+
+        const parts = datePart.split('/');
+        if (parts.length === 3) {
+            const day = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1; 
+            const year = parseInt(parts[2], 10);
+            
+            let hours = 0, minutes = 0, seconds = 0;
+            if (timePart) {
+                const timeParts = timePart.split(':');
+                if (timeParts.length >= 2) {
+                    hours = parseInt(timeParts[0], 10);
+                    minutes = parseInt(timeParts[1], 10);
+                    seconds = timeParts[2] ? parseInt(timeParts[2], 10) : 0;
+                }
+            }
+            return new Date(year, month, day, hours, minutes, seconds);
+        }
+    }
+
+    // 2. Tenta formato ISO: YYYY-MM-DD com Correção Inteligente de Swap
+    if (cleanStr.includes('-')) {
+        const cleanISO = cleanStr.replace('T', ' ').replace('Z', '').split('+')[0].trim();
+        const [datePart, timePart] = cleanISO.split(' ');
+        
+        const parts = datePart.split('-');
+        if (parts.length === 3) {
+            const part0 = parseInt(parts[0], 10); // Ano
+            const part1 = parseInt(parts[1], 10); // Mês ou Dia?
+            const part2 = parseInt(parts[2], 10); // Dia ou Mês?
+
+            let hours = 0, minutes = 0, seconds = 0;
+            if (timePart) {
+                const timeParts = timePart.split(':');
+                if (timeParts.length >= 2) {
+                    hours = parseInt(timeParts[0], 10);
+                    minutes = parseInt(timeParts[1], 10);
+                    seconds = timeParts[2] ? parseInt(timeParts[2], 10) : 0;
+                }
+            }
+
+            // Opção A: Padrão (YYYY-MM-DD)
+            const dateStandard = new Date(part0, part1 - 1, part2, hours, minutes, seconds);
+
+            // Opção B: Invertido (YYYY-DD-MM) - Só tenta se o "dia" padrão puder ser um mês (<=12)
+            let dateSwapped = null;
+            if (part2 <= 12) {
+                 dateSwapped = new Date(part0, part2 - 1, part1, hours, minutes, seconds);
+            }
+
+            // Lógica de Decisão: Qual data está mais perto de "Agora"?
+            if (dateSwapped) {
+                 const diffStandard = Math.abs(now.getTime() - dateStandard.getTime());
+                 const diffSwapped = Math.abs(now.getTime() - dateSwapped.getTime());
+
+                 // Se a data invertida for significativamente mais próxima (diferença > 24h no padrão), usa a invertida
+                 if (diffSwapped < diffStandard && diffStandard > 86400000) {
+                     return dateSwapped;
+                 }
+            }
+
+            return dateStandard;
+        }
+    }
+
+    // Fallback final
+    const d = new Date(cleanStr);
+    return isNaN(d.getTime()) ? null : d;
+  };
+
+  // Cronômetro Atualizado: HH:MM:SS
   const getElapsedTime = (m: Manifesto, colId: string) => {
     let dateStr = '';
     
@@ -95,21 +175,23 @@ export const Dashboard: React.FC<DashboardProps> = ({
         default: dateStr = m.carimboDataHR || '';
     }
 
-    if (!dateStr) return '--:--';
+    if (!dateStr) return '--:--:--';
 
-    const safeDate = dateStr.includes('T') ? dateStr : dateStr.replace(' ', 'T');
-    const startDate = new Date(safeDate);
+    // USAR O PARSER INTELIGENTE
+    const startDate = parseDateBr(dateStr);
     
-    if (isNaN(startDate.getTime())) return '--:--';
+    if (!startDate || isNaN(startDate.getTime())) return '--:--:--';
 
     const diffMs = currentTime.getTime() - startDate.getTime();
-    if (diffMs < 0) return '00:00';
+    if (diffMs < 0) return '00:00:00';
 
     const diffSecs = Math.floor(diffMs / 1000);
     const hours = Math.floor(diffSecs / 3600);
     const minutes = Math.floor((diffSecs % 3600) / 60);
+    const seconds = diffSecs % 60; // Calculando segundos
 
-    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+    // Retorna HH:MM:SS (Horas podem passar de 99, ex: 696)
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
   };
 
   // Cores por CIA

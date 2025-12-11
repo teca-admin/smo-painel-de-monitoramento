@@ -33,12 +33,94 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({ data, events = [], o
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
 
+  // Função robusta para interpretar datas (BR e ISO)
+  const parseDateBr = (dateStr?: string): Date | null => {
+    if (!dateStr) return null;
+    const cleanStr = dateStr.trim();
+    const now = new Date();
+
+    // 1. Tenta formato BR: DD/MM/AAAA HH:mm:ss
+    if (cleanStr.includes('/')) {
+        const [datePart, timePart] = cleanStr.split(' ');
+        if (!datePart) return null;
+
+        const parts = datePart.split('/');
+        if (parts.length === 3) {
+            const day = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1; 
+            const year = parseInt(parts[2], 10);
+            
+            let hours = 0, minutes = 0, seconds = 0;
+            if (timePart) {
+                const timeParts = timePart.split(':');
+                if (timeParts.length >= 2) {
+                    hours = parseInt(timeParts[0], 10);
+                    minutes = parseInt(timeParts[1], 10);
+                    seconds = timeParts[2] ? parseInt(timeParts[2], 10) : 0;
+                }
+            }
+            return new Date(year, month, day, hours, minutes, seconds);
+        }
+    }
+
+    // 2. Tenta formato ISO com correção inteligente de Swap
+    if (cleanStr.includes('-')) {
+        const cleanISO = cleanStr.replace('T', ' ').replace('Z', '').split('+')[0].trim();
+        const [datePart, timePart] = cleanISO.split(' ');
+        
+        const parts = datePart.split('-');
+        if (parts.length === 3) {
+            const part0 = parseInt(parts[0], 10); // Ano
+            const part1 = parseInt(parts[1], 10); // Mês ou Dia?
+            const part2 = parseInt(parts[2], 10); // Dia ou Mês?
+
+            let hours = 0, minutes = 0, seconds = 0;
+            if (timePart) {
+                const timeParts = timePart.split(':');
+                if (timeParts.length >= 2) {
+                    hours = parseInt(timeParts[0], 10);
+                    minutes = parseInt(timeParts[1], 10);
+                    seconds = timeParts[2] ? parseInt(timeParts[2], 10) : 0;
+                }
+            }
+            
+            // Opção A: Padrão YYYY-MM-DD
+            const dateStandard = new Date(part0, part1 - 1, part2, hours, minutes, seconds);
+
+            // Opção B: Invertido YYYY-DD-MM
+            let dateSwapped = null;
+            if (part2 <= 12) {
+                 dateSwapped = new Date(part0, part2 - 1, part1, hours, minutes, seconds);
+            }
+
+            if (dateSwapped) {
+                 const diffStandard = Math.abs(now.getTime() - dateStandard.getTime());
+                 const diffSwapped = Math.abs(now.getTime() - dateSwapped.getTime());
+
+                 // Se a data invertida for mais coerente (mais próxima do "agora")
+                 if (diffSwapped < diffStandard && diffStandard > 86400000) {
+                     return dateSwapped;
+                 }
+            }
+
+            return dateStandard;
+        }
+    }
+
+    // Fallback
+    const d = new Date(cleanStr);
+    return isNaN(d.getTime()) ? null : d;
+  };
+
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return "Não registrado";
-    const safeDate = dateStr.includes('T') ? dateStr : dateStr.replace(' ', 'T');
-    const d = new Date(safeDate);
-    if (isNaN(d.getTime())) return dateStr;
     
+    // Usa o parser seguro
+    const d = parseDateBr(dateStr);
+    
+    if (!d || isNaN(d.getTime())) return dateStr;
+    
+    // Formata explicitamente para PT-BR
     return d.toLocaleString('pt-BR', { 
       day: '2-digit', month: '2-digit', year: 'numeric', 
       hour: '2-digit', minute: '2-digit', second: '2-digit' 
