@@ -9,12 +9,12 @@ interface DashboardProps {
 
 // Configuração das Colunas do Kanban
 const KANBAN_COLUMNS = [
-  { id: 'recebido', title: 'Manifesto Recebido', color: '#ff6c00', lightColor: 'bg-orange-50', borderColor: 'border-orange-500', textColor: 'text-orange-700' },
-  { id: 'iniciado', title: 'Manifesto Iniciado', color: '#fbbc04', lightColor: 'bg-yellow-50', borderColor: 'border-yellow-500', textColor: 'text-yellow-700' },
-  { id: 'disponivel', title: 'Manifesto Disponível', color: '#0c343d', lightColor: 'bg-cyan-50', borderColor: 'border-cyan-600', textColor: 'text-cyan-800' },
-  { id: 'conferencia', title: 'Em Conferência', color: '#50284f', lightColor: 'bg-purple-50', borderColor: 'border-purple-600', textColor: 'text-purple-800' },
-  { id: 'pendente', title: 'Manifesto Pendente', color: '#db091b', lightColor: 'bg-red-50', borderColor: 'border-red-500', textColor: 'text-red-700' },
-  { id: 'completo', title: 'Entregue / Completo', color: '#198754', lightColor: 'bg-green-50', borderColor: 'border-green-500', textColor: 'text-green-700' },
+  { id: 'recebido', title: 'Manifesto Recebido', color: '#ff6c00', bgHeader: 'bg-orange-100', borderColor: 'border-orange-500', textColor: 'text-orange-800' },
+  { id: 'iniciado', title: 'Manifesto Iniciado', color: '#fbbc04', bgHeader: 'bg-yellow-100', borderColor: 'border-yellow-500', textColor: 'text-yellow-800' },
+  { id: 'disponivel', title: 'Manifesto Disponível', color: '#0c343d', bgHeader: 'bg-cyan-100', borderColor: 'border-cyan-700', textColor: 'text-cyan-900' },
+  { id: 'conferencia', title: 'Em Conferência', color: '#50284f', bgHeader: 'bg-purple-100', borderColor: 'border-purple-700', textColor: 'text-purple-900' },
+  { id: 'pendente', title: 'Manifesto Pendente', color: '#db091b', bgHeader: 'bg-red-100', borderColor: 'border-red-600', textColor: 'text-red-800' },
+  { id: 'completo', title: 'Entregue / Completo', color: '#198754', bgHeader: 'bg-green-100', borderColor: 'border-green-600', textColor: 'text-green-800' },
 ];
 
 export const Dashboard: React.FC<DashboardProps> = ({ 
@@ -89,75 +89,79 @@ export const Dashboard: React.FC<DashboardProps> = ({
   };
 
   return (
-    <div className="h-screen bg-slate-100 flex flex-col font-sans overflow-hidden">
+    // CONTAINER PRINCIPAL - 98% DA TELA E CENTRALIZADO
+    <div className="w-[98%] h-[97vh] bg-white rounded-3xl shadow-2xl border border-slate-300 flex flex-col overflow-hidden relative">
       
       {/* HEADER SUPERIOR */}
-      <header className="bg-white px-6 py-3 shadow-sm border-b border-slate-200 shrink-0 z-20 flex justify-between items-center">
-        <div className="flex items-center gap-4">
-           {/* Logo / Título */}
-           <div className="bg-[#690c76] text-white p-2 rounded-lg shadow-md">
-              <Box size={24} strokeWidth={2} />
+      <header className="px-8 py-4 bg-white border-b border-slate-200 shrink-0 z-20 flex justify-between items-center h-[90px]">
+        
+        {/* Lado Esquerdo: Título e Status */}
+        <div className="flex items-center gap-5">
+           <div className="bg-gradient-to-br from-[#690c76] to-[#4a0852] text-white p-3 rounded-xl shadow-lg shadow-purple-900/20">
+              <Box size={32} strokeWidth={2.5} />
            </div>
            <div>
-              <h1 className="text-lg font-bold text-slate-800 leading-tight">Painel de Monitoramento</h1>
-              <div className="text-xs font-medium text-slate-500 flex items-center gap-2">
-                 <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+              <h1 className="text-2xl font-black text-slate-800 tracking-tight">Painel de Monitoramento</h1>
+              <div className="text-sm font-semibold text-slate-500 flex items-center gap-2 mt-0.5">
+                 <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
                  Operação em Tempo Real
               </div>
            </div>
         </div>
 
-        {/* Relógio Central */}
-        <div className="flex flex-col items-center absolute left-1/2 -translate-x-1/2">
-           <div className="text-3xl font-bold text-slate-700 tracking-wider font-mono">
+        {/* Centro: Relógio Grande */}
+        <div className="flex flex-col items-center absolute left-1/2 -translate-x-1/2 bg-slate-50 px-8 py-2 rounded-2xl border border-slate-100 shadow-inner">
+           <div className="text-5xl font-black text-slate-800 tracking-widest font-mono leading-none">
               {currentTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
            </div>
-           <div className="text-xs text-slate-400 font-medium uppercase tracking-wide">
+           <div className="text-sm font-bold text-slate-500 uppercase tracking-[0.2em] mt-1">
               {currentTime.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
            </div>
         </div>
 
-        {/* Busca */}
+        {/* Lado Direito: Busca */}
         <div className="flex items-center gap-4">
-           <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+           <div className="relative group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#690c76] transition-colors" size={20} />
               <input 
                 type="text" 
                 placeholder="Filtrar Manifesto..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-full text-sm focus:ring-2 focus:ring-[#690c76] outline-none text-slate-700 w-[240px] transition-all"
+                className="pl-12 pr-6 py-3 bg-slate-100 border-2 border-slate-100 rounded-xl text-base font-medium focus:ring-4 focus:ring-[#690c76]/10 focus:border-[#690c76] outline-none text-slate-700 w-[300px] transition-all placeholder:text-slate-400"
               />
            </div>
         </div>
       </header>
 
-      {/* ÁREA KANBAN */}
-      <main className="flex-1 overflow-x-auto overflow-y-hidden p-6 bg-slate-100">
-        <div className="flex h-full gap-5 min-w-max pb-2">
+      {/* ÁREA KANBAN - GRID DE 6 COLUNAS */}
+      <main className="flex-1 overflow-hidden p-6 bg-slate-50">
+        <div className="grid grid-cols-6 gap-5 h-full w-full">
           
           {KANBAN_COLUMNS.map((col) => {
             const items = columnsData[col.id as keyof typeof columnsData] || [];
             
             return (
-              <div key={col.id} className="flex flex-col w-[320px] h-full rounded-2xl bg-slate-200/60 border border-white/50 shadow-inner backdrop-blur-sm">
+              <div key={col.id} className="flex flex-col h-full rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden min-w-0">
                 
                 {/* Cabeçalho da Coluna */}
-                <div className={`p-4 rounded-t-2xl bg-white border-t-4 ${col.borderColor} shadow-sm flex justify-between items-center shrink-0 z-10`}>
-                   <h2 className={`font-bold text-sm uppercase tracking-wide ${col.textColor}`}>{col.title}</h2>
-                   <span className={`text-xs font-bold px-2 py-1 rounded-md ${col.lightColor} ${col.textColor} border ${col.borderColor}/20`}>
-                      {items.length}
-                   </span>
+                <div className={`p-4 border-b-4 ${col.borderColor} ${col.bgHeader} flex flex-col gap-1 shrink-0`}>
+                   <div className="flex justify-between items-center">
+                      <h2 className={`font-black text-lg leading-tight uppercase tracking-tight ${col.textColor} truncate`} title={col.title}>
+                        {col.title.replace('Manifesto ', '')}
+                      </h2>
+                      <span className={`text-sm font-bold px-2.5 py-0.5 rounded-lg bg-white/60 ${col.textColor} shadow-sm border border-white/50 backdrop-blur-sm`}>
+                          {items.length}
+                      </span>
+                   </div>
                 </div>
 
                 {/* Lista de Cartões */}
-                <div className="flex-1 overflow-y-auto p-3 space-y-3 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto p-3 space-y-3 custom-scrollbar bg-slate-50/50">
                    {items.length === 0 ? (
-                      <div className="h-full flex flex-col items-center justify-center text-slate-400 opacity-60">
-                         <div className="bg-slate-300/50 p-4 rounded-full mb-3">
-                            <Box size={24} />
-                         </div>
-                         <span className="text-xs font-medium">Sem manifestos</span>
+                      <div className="h-full flex flex-col items-center justify-center text-slate-300 opacity-70">
+                         <Box size={40} strokeWidth={1.5} />
+                         <span className="text-sm font-semibold mt-2">Vazio</span>
                       </div>
                    ) : (
                       items.map(m => {
@@ -169,50 +173,58 @@ export const Dashboard: React.FC<DashboardProps> = ({
                               key={m.id}
                               onClick={() => openHistory(m.id)}
                               className={`
-                                group relative bg-white rounded-xl p-4 shadow-sm border border-slate-200 cursor-pointer 
-                                transition-all duration-200 hover:shadow-lg hover:-translate-y-1 hover:border-[#690c76]/50
-                                ${isRecent ? 'ring-2 ring-blue-400/30' : ''}
+                                group relative bg-white rounded-xl p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-slate-200 cursor-pointer 
+                                transition-all duration-200 hover:shadow-xl hover:-translate-y-1 hover:border-[#690c76] hover:ring-1 hover:ring-[#690c76]
+                                ${isRecent ? 'ring-2 ring-blue-400 ring-offset-1' : ''}
                               `}
                            >
-                              {/* Indicador Lateral de Cor da Coluna */}
-                              <div className={`absolute left-0 top-3 bottom-3 w-1 rounded-r-md`} style={{ backgroundColor: col.color }}></div>
+                              {/* Tarja Lateral de Status */}
+                              <div className="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-xl" style={{ backgroundColor: col.color }}></div>
 
-                              {/* Cabeçalho do Card */}
-                              <div className="flex justify-between items-start mb-3 pl-3">
-                                 <div>
-                                    <div className="text-lg font-bold text-slate-800 leading-none mb-1">{m.id.split('-').pop()}</div>
-                                    <div className="text-[10px] text-slate-400 font-mono">{m.id}</div>
-                                 </div>
-                                 <span className="px-2 py-1 rounded-md bg-slate-100 text-[10px] font-bold uppercase text-slate-600 border border-slate-200">
-                                    {m.cia}
-                                 </span>
-                              </div>
-
-                              {/* Conteúdo Principal (Cargas) */}
-                              <div className="flex gap-2 mb-3 pl-3">
-                                 <div className="flex-1 bg-slate-50 rounded-lg p-2 border border-slate-100 flex flex-col items-center justify-center">
-                                    <span className="text-[9px] text-slate-400 font-bold uppercase mb-0.5">IN/H</span>
-                                    <span className="text-sm font-bold text-slate-700 flex items-center gap-1">
-                                       <Package size={12} className="text-slate-400" /> {m.cargasINH}
+                              {/* Conteúdo do Card */}
+                              <div className="pl-3">
+                                 {/* ID e CIA */}
+                                 <div className="flex justify-between items-start mb-3">
+                                    <div>
+                                       <div className="text-2xl font-black text-slate-800 leading-none mb-1 tracking-tight">
+                                          {m.id.split('-').pop()}
+                                       </div>
+                                       <div className="text-xs font-bold text-slate-400 font-mono tracking-wide">{m.id}</div>
+                                    </div>
+                                    <span className="px-2 py-1 rounded-md bg-slate-100 text-xs font-bold uppercase text-slate-600 border border-slate-200 tracking-wide">
+                                       {m.cia}
                                     </span>
                                  </div>
-                                 <div className="flex-1 bg-slate-50 rounded-lg p-2 border border-slate-100 flex flex-col items-center justify-center">
-                                    <span className="text-[9px] text-slate-400 font-bold uppercase mb-0.5">IZ</span>
-                                    <span className="text-sm font-bold text-slate-700 flex items-center gap-1">
-                                       <Package size={12} className="text-slate-400" /> {m.cargasIZ}
-                                    </span>
-                                 </div>
-                              </div>
 
-                              {/* Rodapé do Card */}
-                              <div className="flex justify-between items-center pl-3 pt-2 border-t border-slate-100">
-                                 <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium" title={`Turno: ${m.turno}`}>
-                                    <Plane size={12} className="text-slate-400" />
-                                    <span>{m.turno?.replace('Turno', 'T') || '-'}</span>
+                                 {/* Cargas (Aumentado) */}
+                                 <div className="flex gap-2 mb-3">
+                                    <div className="flex-1 bg-slate-50 rounded-lg p-2 border border-slate-100 flex flex-col items-center justify-center group-hover:bg-purple-50 group-hover:border-purple-100 transition-colors">
+                                       <span className="text-[10px] text-slate-400 font-bold uppercase mb-0.5">IN/H</span>
+                                       <span className="text-lg font-black text-slate-700 flex items-center gap-1">
+                                          <Package size={14} className="text-slate-400" /> {m.cargasINH}
+                                       </span>
+                                    </div>
+                                    <div className="flex-1 bg-slate-50 rounded-lg p-2 border border-slate-100 flex flex-col items-center justify-center group-hover:bg-purple-50 group-hover:border-purple-100 transition-colors">
+                                       <span className="text-[10px] text-slate-400 font-bold uppercase mb-0.5">IZ</span>
+                                       <span className="text-lg font-black text-slate-700 flex items-center gap-1">
+                                          <Package size={14} className="text-slate-400" /> {m.cargasIZ}
+                                       </span>
+                                    </div>
                                  </div>
-                                 <div className={`flex items-center gap-1 text-xs font-bold ${col.textColor} bg-white px-2 py-0.5 rounded-full shadow-sm border ${col.borderColor}/20`}>
-                                    <Clock size={11} />
-                                    {relevantTime.time}
+
+                                 {/* Rodapé (Tempo e Turno) */}
+                                 <div className="flex justify-between items-center pt-2 border-t border-slate-100">
+                                    <div className="flex items-center gap-1.5 text-sm text-slate-500 font-semibold" title={`Turno: ${m.turno}`}>
+                                       <Plane size={14} className="text-slate-400" />
+                                       <span>{m.turno?.replace('Turno', 'T') || '-'}</span>
+                                    </div>
+                                    <div 
+                                      className="flex items-center gap-1.5 text-sm font-bold px-2 py-1 rounded-full shadow-sm border"
+                                      style={{ color: col.color, borderColor: `${col.color}30`, backgroundColor: `${col.color}10` }}
+                                    >
+                                       <Clock size={14} strokeWidth={2.5} />
+                                       {relevantTime.time}
+                                    </div>
                                  </div>
                               </div>
                            </div>

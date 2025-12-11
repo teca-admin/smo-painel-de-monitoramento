@@ -8,16 +8,21 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       body {
         font-family: 'Inter', sans-serif;
-        background-color: #f5f5f5;
-        color: #333; /* Ensure dark text by default */
-        zoom: 0.7; /* Redução acumulada para 70% */
+        background-color: #e2e8f0; /* Slate-200 for better contrast with the panel */
+        color: #1e293b;
+        zoom: 0.63; /* Reduzido de 0.7 conforme solicitado (-10%) */
+        overflow: hidden; /* Evita barras de rolagem na window principal */
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
       
       /* Custom Keyframes */
@@ -47,30 +52,20 @@
       .animate-slideInUp { animation: slideInUp 0.4s ease-out; }
       .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
 
-      /* Shape utilities */
-      .shape { position: absolute; border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%; }
-      .dot { position: absolute; width: 6px; height: 6px; background: rgba(255, 255, 255, 0.4); border-radius: 50%; }
-      .wave-line { position: absolute; stroke: rgba(255, 255, 255, 0.25); fill: none; stroke-width: 2; }
-
-      /* Custom Scrollbar */
+      /* Custom Scrollbar - Thicker for monitoring */
       .custom-scrollbar::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
+        width: 6px;
+        height: 6px;
       }
       .custom-scrollbar::-webkit-scrollbar-track {
         background: rgba(0, 0, 0, 0.05);
-        border-radius: 4px;
       }
       .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #ccc;
-        border-radius: 4px;
-        border: 2px solid rgba(0,0,0,0); /* Creates padding around thumb */
-        background-clip: padding-box;
+        background: #94a3b8;
+        border-radius: 10px;
       }
       .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: #999;
-        border: 2px solid rgba(0,0,0,0);
-        background-clip: padding-box;
+        background: #64748b;
       }
     </style>
   <script type="importmap">
@@ -89,7 +84,7 @@
 </script>
 </head>
   <body>
-    <div id="root"></div>
+    <div id="root" class="w-full h-full flex items-center justify-center"></div>
     <script type="module" src="/index.tsx"></script>
   </body>
 </html>
