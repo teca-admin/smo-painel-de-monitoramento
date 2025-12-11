@@ -17,12 +17,20 @@
         font-family: 'Inter', sans-serif;
         background-color: #f1f5f9; /* Slate-100/Gray background */
         color: #1e293b;
-        zoom: 0.58; /* Zoom ajustado conforme solicitado */
+        zoom: 0.58; /* Zoom padrão para Desktop (Dashboard TV) */
         overflow: hidden;
         height: 100vh;
         margin: 0;
       }
       
+      /* Mobile/Tablet Reset */
+      @media (max-width: 1024px) {
+        body {
+          zoom: 1.0;
+          overflow: auto; /* Permite scroll nativo se necessário, embora o App controle */
+        }
+      }
+
       /* Custom Scrollbar */
       .custom-scrollbar::-webkit-scrollbar {
         width: 6px;

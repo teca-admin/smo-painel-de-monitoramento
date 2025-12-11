@@ -150,29 +150,31 @@ export const Dashboard: React.FC<DashboardProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100 overflow-hidden">
+    <div className="flex flex-col lg:h-[200vh] h-screen bg-gray-100 overflow-hidden">
       
-      {/* HEADER SIMPLIFICADO - Altura reduzida para 60px */}
-      <header className="flex-none bg-white border-b border-gray-200 px-4 py-2 flex items-center justify-between shadow-sm z-10 h-[60px]">
-        <div className="flex items-center gap-3">
-           <div className="bg-[#690c76] text-white p-2 rounded-lg shadow-sm">
-              <Box size={24} />
+      {/* HEADER SIMPLIFICADO - Responsivo */}
+      <header className="flex-none bg-white border-b border-gray-200 px-4 py-2 flex flex-col md:flex-row items-center justify-between shadow-sm z-10 gap-2 md:gap-0 min-h-[60px]">
+        <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
+           <div className="flex items-center gap-3">
+               <div className="bg-[#690c76] text-white p-2 rounded-lg shadow-sm">
+                  <Box size={24} />
+               </div>
+               <h1 className="text-xl font-bold text-gray-800 tracking-tight whitespace-nowrap">Painel SMO</h1>
            </div>
-           <h1 className="text-xl font-bold text-gray-800 tracking-tight">Painel Operacional SMO</h1>
         </div>
 
-        {/* Relógio Central Completo e Extenso */}
-        <div className="flex flex-col items-center">
-           <div className="text-3xl font-bold text-gray-700 leading-none font-mono">
+        {/* Relógio Central Completo e Extenso - Reordenado para mobile */}
+        <div className="flex flex-col items-center order-3 md:order-2">
+           <div className="text-2xl md:text-3xl font-bold text-gray-700 leading-none font-mono">
               {currentTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
            </div>
-           <div className="text-xs font-semibold text-gray-400 uppercase tracking-widest mt-0.5">
+           <div className="text-[10px] md:text-xs font-semibold text-gray-400 uppercase tracking-widest mt-0.5">
               {currentTime.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
            </div>
         </div>
 
         {/* Busca Compacta */}
-        <div className="w-[300px] relative">
+        <div className="w-full md:w-[300px] relative order-2 md:order-3">
            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
            <input 
              type="text" 
@@ -184,14 +186,15 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
       </header>
 
-      {/* ÁREA DO KANBAN - 98% Width & 100% Vertical Disponível */}
-      <main className="flex-1 w-[98%] mx-auto pt-2 pb-0 overflow-hidden h-[calc(100vh-60px)]">
-         <div className="grid grid-cols-6 gap-2 h-full pb-2">
+      {/* ÁREA DO KANBAN - Responsivo: Scroll Vertical no Mobile, Overflow Hidden no Desktop (mas com altura 200vh) */}
+      <main className="flex-1 w-[98%] mx-auto pt-2 pb-0 lg:overflow-hidden overflow-y-auto lg:h-[calc(200vh-60px)] h-auto">
+         {/* Grid: 1 coluna no mobile, 6 colunas no Desktop */}
+         <div className="grid grid-cols-1 lg:grid-cols-6 gap-2 lg:h-full pb-2">
              {KANBAN_COLUMNS.map(col => {
                 const items = columnsData[col.id as keyof typeof columnsData] || [];
                 
                 return (
-                  <div key={col.id} className="flex flex-col h-full bg-gray-50 rounded-t-xl rounded-b-md border border-gray-200 shadow-sm overflow-hidden">
+                  <div key={col.id} className="flex flex-col lg:h-full min-h-[500px] bg-gray-50 rounded-t-xl rounded-b-md border border-gray-200 shadow-sm overflow-hidden mb-4 lg:mb-0">
                      
                      {/* Header da Coluna */}
                      <div className={`p-3 border-b border-gray-200 bg-white flex justify-between items-center border-t-[5px]`} style={{ borderColor: col.color }}>
