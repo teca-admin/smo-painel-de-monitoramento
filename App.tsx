@@ -6,8 +6,6 @@ import { supabase } from './supabaseClient';
 
 function App() {
   const [manifestos, setManifestos] = useState<Manifesto[]>([]);
-  
-  // Modal States (Apenas Visualização de Histórico mantida)
   const [viewingHistoryId, setViewingHistoryId] = useState<string | null>(null);
   const [historyEvents, setHistoryEvents] = useState<ManifestoEvent[]>([]); 
 
@@ -19,7 +17,7 @@ function App() {
     dataHoraRecebido: item.Manifesto_Recebido,
     cargasINH: item["Cargas_(IN/H)"],
     cargasIZ: item["Cargas_(IZ)"],
-    status: item.Status, // Importante: O Dashboard filtra baseado neste campo exato
+    status: item.Status, 
     turno: item.Turno,
     carimboDataHR: item["Carimbo_Data/HR"],
     usuarioOperacao: item["Usuario_Operação"],
@@ -37,7 +35,7 @@ function App() {
         .from('SMO_Sistema')
         .select('*')
         .order('id', { ascending: false })
-        .limit(200); // Aumentado limite para garantir que todos apareçam no painel
+        .limit(200);
 
       if (error) throw error;
 
@@ -50,19 +48,10 @@ function App() {
     }
   }, []);
 
-  // Polling (Busca automática)
   useEffect(() => {
-    // Busca inicial
     fetchManifestos();
-
-    // Intervalo de atualização (5 segundos para monitoramento em tempo real)
-    const intervalId = setInterval(() => {
-      fetchManifestos();
-    }, 5000); 
-
-    return () => {
-      clearInterval(intervalId);
-    };
+    const intervalId = setInterval(fetchManifestos, 5000); 
+    return () => clearInterval(intervalId);
   }, [fetchManifestos]);
 
   const handleOpenHistory = async (id: string) => {
