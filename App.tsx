@@ -21,7 +21,7 @@ function App() {
     dataHoraRecebido: item.Manifesto_Recebido,
     cargasINH: item["Cargas_(IN/H)"],
     cargasIZ: item["Cargas_(IZ)"],
-    status: item.Status,
+    status: item.Status, // Importante: O Dashboard filtra baseado neste campo exato
     turno: item.Turno,
     carimboDataHR: item["Carimbo_Data/HR"],
     usuarioOperacao: item["Usuario_Operação"],
@@ -48,7 +48,7 @@ function App() {
         setManifestos(mappedManifestos);
       }
     } catch (error: any) {
-      // Falha silenciosa no polling
+      // Falha silenciosa no polling para não interromper a UI
       console.error("Erro ao buscar manifestos:", error);
     }
   }, []);

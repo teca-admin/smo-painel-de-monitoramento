@@ -15,44 +15,15 @@
     <style>
       body {
         font-family: 'Inter', sans-serif;
-        background-color: #e2e8f0; /* Slate-200 for better contrast with the panel */
+        background-color: #f1f5f9; /* Slate-100/Gray background */
         color: #1e293b;
-        zoom: 0.63; /* Reduzido de 0.7 conforme solicitado (-10%) */
-        overflow: hidden; /* Evita barras de rolagem na window principal */
+        zoom: 0.65; /* Zoom ajustado para 0.65 conforme solicitado */
+        overflow: hidden;
         height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        margin: 0;
       }
       
-      /* Custom Keyframes */
-      @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-      @keyframes float-novo { 0%, 100% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-20px) rotate(5deg); } }
-      @keyframes pulse-dot { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.5); } }
-      @keyframes slideIn-novo { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-      @keyframes pulse-novo { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.1); } }
-      @keyframes rotate-novo { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-      @keyframes rotate-novo-rev { animation: rotate-novo 15s linear infinite reverse; }
-      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-      @keyframes fadeInScale { from { opacity: 0; transform: translateX(-50%) scale(0.9); } to { opacity: 1; transform: translateX(-50%) scale(1); } }
-      @keyframes slideInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-      /* Animation Utility Classes */
-      .animate-fadeInUp { animation: fadeInUp 0.6s ease-out; }
-      .animate-float-novo { animation: float-novo 6s ease-in-out infinite; }
-      .animate-float-novo-rev { animation: float-novo 8s ease-in-out infinite reverse; }
-      .animate-pulse-dot { animation: pulse-dot 3s ease-in-out infinite; }
-      .animate-slideIn-novo { animation: slideIn-novo 0.3s ease-out; }
-      .animate-pulse-novo { animation: pulse-novo 4s ease-in-out infinite; }
-      .animate-rotate-novo { animation: rotate-novo 20s linear infinite; }
-      .animate-rotate-novo-rev { animation: rotate-novo 15s linear infinite reverse; }
-      .animate-spin-custom { animation: spin 1s linear infinite; }
-      .animate-fadeInScale { animation: fadeInScale 0.2s ease-out; }
-      .animate-slideInUp { animation: slideInUp 0.4s ease-out; }
-      .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
-
-      /* Custom Scrollbar - Thicker for monitoring */
+      /* Custom Scrollbar */
       .custom-scrollbar::-webkit-scrollbar {
         width: 6px;
         height: 6px;
@@ -61,11 +32,11 @@
         background: rgba(0, 0, 0, 0.05);
       }
       .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #94a3b8;
+        background: #cbd5e1;
         border-radius: 10px;
       }
       .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: #64748b;
+        background: #94a3b8;
       }
     </style>
   <script type="importmap">
@@ -84,7 +55,7 @@
 </script>
 </head>
   <body>
-    <div id="root" class="w-full h-full flex items-center justify-center"></div>
+    <div id="root" class="w-full h-full"></div>
     <script type="module" src="/index.tsx"></script>
   </body>
 </html>
