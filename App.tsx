@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Dashboard } from './components/Dashboard';
-import { LoadingOverlay, HistoryModal, AlertToast } from './components/Modals';
+import { HistoryModal } from './components/Modals';
 import { Manifesto, SMO_Sistema_DB, ManifestoEvent } from './types';
 import { supabase } from './supabaseClient';
 
@@ -10,8 +10,6 @@ function App() {
   // Modal States (Apenas Visualização de Histórico mantida)
   const [viewingHistoryId, setViewingHistoryId] = useState<string | null>(null);
   const [historyEvents, setHistoryEvents] = useState<ManifestoEvent[]>([]); 
-  const [loadingMsg, setLoadingMsg] = useState<string | null>(null);
-  const [alert, setAlert] = useState<{type: 'success' | 'error', msg: string} | null>(null);
 
   const mapDatabaseRowToManifesto = (item: SMO_Sistema_DB): Manifesto => ({
     id: item.ID_Manifesto,
@@ -39,7 +37,7 @@ function App() {
         .from('SMO_Sistema')
         .select('*')
         .order('id', { ascending: false })
-        .limit(100);
+        .limit(200); // Aumentado limite para garantir que todos apareçam no painel
 
       if (error) throw error;
 
@@ -48,7 +46,6 @@ function App() {
         setManifestos(mappedManifestos);
       }
     } catch (error: any) {
-      // Falha silenciosa no polling para não interromper a UI
       console.error("Erro ao buscar manifestos:", error);
     }
   }, []);
@@ -71,7 +68,6 @@ function App() {
   const handleOpenHistory = async (id: string) => {
     setViewingHistoryId(id);
     setHistoryEvents([]);
-    setLoadingMsg("Carregando histórico...");
 
     try {
       const { data: eventsData, error: eventsError } = await supabase
@@ -85,8 +81,6 @@ function App() {
       }
     } catch (error) {
       console.error("Erro eventos:", error);
-    } finally {
-        setLoadingMsg(null);
     }
   };
 
@@ -104,9 +98,6 @@ function App() {
           onClose={() => setViewingHistoryId(null)}
         />
       )}
-
-      {loadingMsg && <LoadingOverlay msg={loadingMsg} />}
-      {alert && <AlertToast type={alert.type} msg={alert.msg} />}
     </>
   );
 }

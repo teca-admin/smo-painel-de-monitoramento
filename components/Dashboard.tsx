@@ -7,49 +7,61 @@ interface DashboardProps {
   openHistory: (id: string) => void;
 }
 
-// Configuração das Colunas (Cores Originais)
+// Configuração das Colunas com as CORES SOLICITADAS
 const KANBAN_COLUMNS = [
   { 
     id: 'recebido', 
     title: 'Recebido', 
-    headerColor: 'text-[#ff6c00]', 
-    borderColor: 'border-[#ff6c00]',
-    bgBadge: 'bg-[#ff6c00]/10'
+    // #ff7f00
+    color: '#ff7f00',
+    headerClass: 'text-[#ff7f00]', 
+    borderClass: 'border-[#ff7f00]',
+    bgBadge: 'bg-[#ff7f00]/10'
   },
   { 
     id: 'iniciado', 
     title: 'Iniciado', 
-    headerColor: 'text-[#fbbc04]', 
-    borderColor: 'border-[#fbbc04]',
-    bgBadge: 'bg-[#fbbc04]/10'
+    // #fcc502
+    color: '#fcc502',
+    headerClass: 'text-[#fcc502]', 
+    borderClass: 'border-[#fcc502]',
+    bgBadge: 'bg-[#fcc502]/10'
   },
   { 
     id: 'disponivel', 
     title: 'Disponível', 
-    headerColor: 'text-[#0c343d]', 
-    borderColor: 'border-[#0c343d]',
-    bgBadge: 'bg-[#0c343d]/10'
+    // #134652
+    color: '#134652',
+    headerClass: 'text-[#134652]', 
+    borderClass: 'border-[#134652]',
+    bgBadge: 'bg-[#134652]/10'
   },
   { 
     id: 'conferencia', 
     title: 'Em Conferência', 
-    headerColor: 'text-[#50284f]', 
-    borderColor: 'border-[#50284f]',
-    bgBadge: 'bg-[#50284f]/10'
+    // #683767
+    color: '#683767',
+    headerClass: 'text-[#683767]', 
+    borderClass: 'border-[#683767]',
+    bgBadge: 'bg-[#683767]/10'
   },
   { 
     id: 'pendente', 
     title: 'Pendente', 
-    headerColor: 'text-[#db091b]', 
-    borderColor: 'border-[#db091b]',
-    bgBadge: 'bg-[#db091b]/10'
+    // #f5293b
+    color: '#f5293b',
+    headerClass: 'text-[#f5293b]', 
+    borderClass: 'border-[#f5293b]',
+    bgBadge: 'bg-[#f5293b]/10'
   },
   { 
     id: 'completo', 
     title: 'Completo', 
-    headerColor: 'text-[#198754]', 
-    borderColor: 'border-[#198754]',
-    bgBadge: 'bg-[#198754]/10'
+    // #0b5fcf
+    color: '#0b5fcf',
+    headerClass: 'text-[#0b5fcf]', 
+    borderClass: 'border-[#0b5fcf]',
+    bgBadge: 'bg-[#0b5fcf]/10'
   },
 ];
 
@@ -59,7 +71,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const [currentTime, setCurrentTime] = useState(new Date());
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Atualiza relógio
+  // Atualiza relógio geral e força re-render dos cronômetros a cada segundo
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
@@ -102,84 +114,97 @@ export const Dashboard: React.FC<DashboardProps> = ({
     return cols;
   }, [manifestos, searchTerm]);
 
-  // Formatação de Hora
-  const formatTime = (dateStr?: string) => {
-    if (!dateStr) return '--:--';
-    const safeDate = dateStr.includes('T') ? dateStr : dateStr.replace(' ', 'T');
-    const d = new Date(safeDate);
-    if (isNaN(d.getTime())) return '--:--';
-    return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-  };
-
-  // Helper para mostrar qual horário exibir
-  const getRelevantTime = (m: Manifesto, colId: string) => {
+  // Função para calcular o tempo decorrido (Cronômetro)
+  const getElapsedTime = (m: Manifesto, colId: string) => {
+    let dateStr = '';
+    
     switch(colId) {
-        case 'recebido': return formatTime(m.dataHoraRecebido);
-        case 'iniciado': return formatTime(m.dataHoraIniciado || m.dataHoraRecebido);
-        case 'disponivel': return formatTime(m.dataHoraDisponivel || m.dataHoraIniciado);
-        case 'conferencia': return formatTime(m.dataHoraConferencia || m.dataHoraDisponivel);
-        case 'pendente': return formatTime(m.dataHoraPendente || m.dataHoraConferencia);
-        case 'completo': return formatTime(m.dataHoraCompleto || m.dataHoraPendente);
-        default: return formatTime(m.carimboDataHR);
+        case 'recebido': dateStr = m.dataHoraRecebido; break;
+        case 'iniciado': dateStr = m.dataHoraIniciado || m.dataHoraRecebido; break;
+        case 'disponivel': dateStr = m.dataHoraDisponivel || m.dataHoraIniciado; break;
+        case 'conferencia': dateStr = m.dataHoraConferencia || m.dataHoraDisponivel; break;
+        case 'pendente': dateStr = m.dataHoraPendente || m.dataHoraConferencia; break;
+        case 'completo': dateStr = m.dataHoraCompleto || m.dataHoraPendente; break;
+        default: dateStr = m.carimboDataHR || '';
     }
+
+    if (!dateStr) return '--:--';
+
+    const safeDate = dateStr.includes('T') ? dateStr : dateStr.replace(' ', 'T');
+    const startDate = new Date(safeDate);
+    
+    if (isNaN(startDate.getTime())) return '--:--';
+
+    const diffMs = currentTime.getTime() - startDate.getTime();
+    
+    // Se for negativo (data no futuro por erro de fuso), zera
+    if (diffMs < 0) return '00:00';
+
+    const diffSecs = Math.floor(diffMs / 1000);
+    const hours = Math.floor(diffSecs / 3600);
+    const minutes = Math.floor((diffSecs % 3600) / 60);
+    // const seconds = diffSecs % 60; // Opcional, se quiser segundos descomente abaixo
+
+    // Formato HH:MM
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
   };
 
   return (
     <div className="flex flex-col h-screen bg-gray-100 overflow-hidden">
       
-      {/* HEADER SIMPLIFICADO */}
-      <header className="flex-none bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between shadow-sm z-10 h-[75px]">
-        <div className="flex items-center gap-4">
-           <div className="bg-[#690c76] text-white p-2.5 rounded-lg shadow-sm">
-              <Box size={28} />
+      {/* HEADER SIMPLIFICADO - Altura reduzida para 60px */}
+      <header className="flex-none bg-white border-b border-gray-200 px-4 py-2 flex items-center justify-between shadow-sm z-10 h-[60px]">
+        <div className="flex items-center gap-3">
+           <div className="bg-[#690c76] text-white p-2 rounded-lg shadow-sm">
+              <Box size={24} />
            </div>
-           <h1 className="text-2xl font-bold text-gray-800 tracking-tight">Painel Operacional SMO</h1>
+           <h1 className="text-xl font-bold text-gray-800 tracking-tight">Painel Operacional SMO</h1>
         </div>
 
-        {/* Relógio Central */}
+        {/* Relógio Central Completo e Extenso */}
         <div className="flex flex-col items-center">
-           <div className="text-4xl font-bold text-gray-700 leading-none font-mono">
+           <div className="text-3xl font-bold text-gray-700 leading-none font-mono">
               {currentTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
            </div>
-           <div className="text-sm font-semibold text-gray-400 uppercase tracking-widest mt-1">
-              {currentTime.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' })}
+           <div className="text-xs font-semibold text-gray-400 uppercase tracking-widest mt-0.5">
+              {currentTime.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
            </div>
         </div>
 
-        {/* Busca */}
-        <div className="w-[350px] relative">
-           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+        {/* Busca Compacta */}
+        <div className="w-[300px] relative">
+           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
            <input 
              type="text" 
              placeholder="Buscar manifesto..." 
              value={searchTerm}
              onChange={(e) => setSearchTerm(e.target.value)}
-             className="w-full pl-10 pr-4 py-2.5 bg-gray-100 border border-gray-200 rounded-lg text-base focus:outline-none focus:border-[#690c76] focus:ring-1 focus:ring-[#690c76] transition-all"
+             className="w-full pl-9 pr-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#690c76] focus:ring-1 focus:ring-[#690c76] transition-all"
            />
         </div>
       </header>
 
-      {/* ÁREA DO KANBAN - 98% Width & 100% Vertical */}
-      <main className="flex-1 w-[98%] mx-auto py-3 overflow-hidden">
-         <div className="grid grid-cols-6 gap-3 h-full">
+      {/* ÁREA DO KANBAN - 98% Width & 100% Vertical Disponível */}
+      <main className="flex-1 w-[98%] mx-auto pt-2 pb-0 overflow-hidden h-[calc(100vh-60px)]">
+         <div className="grid grid-cols-6 gap-2 h-full pb-2">
              {KANBAN_COLUMNS.map(col => {
                 const items = columnsData[col.id as keyof typeof columnsData] || [];
                 
                 return (
-                  <div key={col.id} className="flex flex-col h-full bg-gray-50 rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                  <div key={col.id} className="flex flex-col h-full bg-gray-50 rounded-t-xl rounded-b-md border border-gray-200 shadow-sm overflow-hidden">
                      
                      {/* Header da Coluna */}
-                     <div className={`p-3 border-b border-gray-200 bg-white flex justify-between items-center border-t-4 ${col.borderColor}`}>
-                        <h2 className={`font-bold text-lg uppercase tracking-tight ${col.headerColor}`}>
+                     <div className={`p-3 border-b border-gray-200 bg-white flex justify-between items-center border-t-[5px]`} style={{ borderColor: col.color }}>
+                        <h2 className={`font-bold text-lg uppercase tracking-tight`} style={{ color: col.color }}>
                            {col.title}
                         </h2>
-                        <span className={`px-2.5 py-1 rounded-md text-sm font-bold ${col.bgBadge} ${col.headerColor}`}>
+                        <span className={`px-2.5 py-1 rounded-md text-sm font-bold ${col.bgBadge}`} style={{ color: col.color }}>
                            {items.length}
                         </span>
                      </div>
 
                      {/* Lista de Cards */}
-                     <div className="flex-1 overflow-y-auto p-2 space-y-3 custom-scrollbar">
+                     <div className="flex-1 overflow-y-auto p-2 space-y-3 custom-scrollbar bg-gray-100/50">
                         {items.map(m => (
                            <div 
                              key={m.id}
@@ -190,7 +215,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                              `}
                            >
                               {/* Faixa lateral de cor */}
-                              <div className={`absolute left-0 top-0 bottom-0 w-1.5 rounded-l-lg ${col.headerColor.replace('text-', 'bg-')}`}></div>
+                              <div className={`absolute left-0 top-0 bottom-0 w-1.5 rounded-l-lg`} style={{ backgroundColor: col.color }}></div>
 
                               <div className="pl-3.5">
                                  <div className="flex justify-between items-start mb-2.5">
@@ -222,9 +247,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
                                     <span className="text-xs text-gray-500 font-medium">
                                        {m.turno?.replace('Turno', 'T') || '-'}
                                     </span>
-                                    <div className={`flex items-center gap-1 text-sm font-bold ${col.headerColor}`}>
+                                    {/* Cronômetro */}
+                                    <div className={`flex items-center gap-1 text-sm font-bold`} style={{ color: col.color }}>
                                        <Clock size={14} />
-                                       {getRelevantTime(m, col.id)}
+                                       {getElapsedTime(m, col.id)}
                                     </div>
                                  </div>
                               </div>
@@ -232,9 +258,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         ))}
 
                         {items.length === 0 && (
-                           <div className="text-center py-10 opacity-40">
-                              <Box className="mx-auto mb-2 text-gray-400" size={32} />
-                              <span className="text-sm font-medium text-gray-400">Sem itens</span>
+                           <div className="h-full flex flex-col items-center justify-center opacity-30 pb-20">
+                              <Box className="mb-2 text-gray-400" size={48} />
+                              <span className="text-sm font-medium text-gray-400">Sem itens nesta etapa</span>
                            </div>
                         )}
                      </div>
